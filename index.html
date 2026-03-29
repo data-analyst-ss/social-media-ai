@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Media AI — Sarah Silva</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{
+  --r:#9A3F4A;--rl:#c45a67;--rll:rgba(154,63,74,0.15);
+  --p:#BD6809;--pl:#e8852a;
+  --g:#2F4731;--gl:#4a7550;
+  --neon-r:rgba(196,90,103,0.8);
+  --neon-p:rgba(232,133,42,0.8);
+  --neon-g:rgba(74,117,80,0.8);
+  --bg:#030608;--text:#f0e6d3;--text2:#c4b49a;--text3:#6a5a4a;--cream:#f5ede0;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#000}::-webkit-scrollbar-thumb{background:var(--r);border-radius:2px}
+
+/* CANVAS BG */
+#bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.7}
+
+/* GLOW ORBS */
+.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;animation:orbFloat 8s ease-in-out infinite}
+.orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(154,63,74,0.12),transparent 70%);top:-100px;left:-100px;animation-delay:0s}
+.orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(189,104,9,0.08),transparent 70%);bottom:-100px;right:-100px;animation-delay:-4s}
+.orb3{width:300px;height:300px;background:radial-gradient(circle,rgba(47,71,49,0.1),transparent 70%);top:40%;left:50%;transform:translate(-50%,-50%);animation-delay:-2s}
+@keyframes orbFloat{0%,100%{transform:scale(1) translate(0,0)}33%{transform:scale(1.05) translate(20px,-20px)}66%{transform:scale(0.95) translate(-10px,15px)}}
+
+/* GRID */
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(154,63,74,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(154,63,74,0.04) 1px,transparent 1px);background-size:50px 50px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(3,6,8,0.7);backdrop-filter:blur(40px) saturate(180%);border-bottom:1px solid rgba(154,63,74,0.1)}
+.nav-left{display:flex;align-items:center;gap:40px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-ring{width:28px;height:28px;border-radius:50%;border:1px solid var(--rl);display:flex;align-items:center;justify-content:center;position:relative}
+.logo-ring::before{content:'';position:absolute;inset:-2px;border-radius:50%;border:1px solid rgba(196,90,103,0.3);animation:ringPulse 2s infinite}
+@keyframes ringPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.2);opacity:0}}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--rl);box-shadow:0 0 10px var(--rl),0 0 20px rgba(196,90,103,0.5)}
+.logo-text{font-family:'DM Mono',monospace;font-size:11px;color:var(--rl);letter-spacing:3px;text-transform:uppercase}
+.nav-pills{display:flex;gap:4px}
+.np{padding:5px 14px;border-radius:100px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;text-decoration:none;border:1px solid transparent;color:var(--text3);background:transparent}
+.np:hover,.np.on{background:rgba(154,63,74,0.1);border-color:rgba(154,63,74,0.3);color:var(--rl);box-shadow:0 0 12px rgba(154,63,74,0.15),inset 0 1px 0 rgba(154,63,74,0.1)}
+.nav-right{display:flex;gap:8px}
+.nb{padding:6px 14px;border-radius:6px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-decoration:none;transition:all 0.25s;text-transform:uppercase}
+.nb-g{color:var(--text3);border:1px solid rgba(154,63,74,0.15);background:transparent}.nb-g:hover{border-color:var(--rl);color:var(--rl);box-shadow:0 0 12px rgba(154,63,74,0.2)}
+.nb-f{background:linear-gradient(135deg,var(--r),#7a2030);color:var(--cream);border:none;box-shadow:0 0 20px rgba(154,63,74,0.3)}.nb-f:hover{box-shadow:0 0 30px rgba(154,63,74,0.5);transform:translateY(-1px)}
+
+/* HERO */
+.hero{position:relative;z-index:1;min-height:100vh;display:grid;grid-template-columns:1fr 1.15fr;align-items:center;padding:80px 40px 40px;gap:48px}
+
+.hero-tag{font-family:'DM Mono',monospace;font-size:9px;color:var(--rl);letter-spacing:5px;text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:32px}
+.hero-tag::before{content:'';width:24px;height:1px;background:linear-gradient(90deg,var(--rl),transparent);box-shadow:0 0 8px var(--rl)}
+
+h1{font-family:'Playfair Display',serif;font-size:clamp(36px,4vw,64px);font-weight:900;line-height:1.02;margin-bottom:24px}
+h1 em{font-style:italic;color:var(--rl);position:relative}
+h1 em::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--rl),transparent);box-shadow:0 0 10px var(--rl)}
+h1 .ghost{color:transparent;-webkit-text-stroke:1px rgba(154,63,74,0.2)}
+
+.hero-desc{font-size:15px;color:var(--text2);font-weight:300;line-height:1.85;max-width:440px;margin-bottom:44px}
+
+.hero-stats{display:flex;gap:32px;margin-bottom:44px;padding:20px 24px;background:rgba(154,63,74,0.04);border:1px solid rgba(154,63,74,0.1);border-radius:12px;backdrop-filter:blur(10px)}
+.hstat-val{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--rl);display:block;line-height:1;text-shadow:0 0 20px rgba(154,63,74,0.4)}
+.hstat-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-top:4px}
+.hstat-div{width:1px;background:rgba(154,63,74,0.15);align-self:stretch}
+
+.hero-btns{display:flex;gap:12px}
+.btn{padding:13px 28px;border-radius:8px;font-size:11px;font-family:'DM Mono',monospace;letter-spacing:1.5px;text-decoration:none;transition:all 0.3s;display:inline-flex;align-items:center;gap:8px;text-transform:uppercase}
+.btn-fill{background:linear-gradient(135deg,var(--r),#7a2030);color:var(--cream);box-shadow:0 0 25px rgba(154,63,74,0.3)}.btn-fill:hover{box-shadow:0 0 40px rgba(154,63,74,0.55);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid rgba(154,63,74,0.2)}.btn-ghost:hover{border-color:var(--rl);color:var(--rl);box-shadow:0 0 15px rgba(154,63,74,0.15);transform:translateY(-2px)}
+
+/* HERO DASHBOARD CARD */
+.hero-dash{position:relative}
+.hdash{background:rgba(5,10,14,0.8);border:1px solid rgba(154,63,74,0.15);border-radius:20px;padding:24px;position:relative;overflow:hidden;backdrop-filter:blur(30px);box-shadow:0 0 100px rgba(154,63,74,0.07),0 0 200px rgba(154,63,74,0.03),inset 0 1px 0 rgba(154,63,74,0.1),inset 0 -1px 0 rgba(0,0,0,0.5)}
+.hdash::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--r) 30%,var(--pl) 50%,var(--r) 70%,transparent 100%);background-size:200% 100%;animation:topLine 3s linear infinite}
+@keyframes topLine{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.hdash::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 0%,rgba(154,63,74,0.06),transparent 60%);pointer-events:none}
+
+.dh-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(154,63,74,0.08)}
+.dh-title{font-family:'DM Mono',monospace;font-size:10px;color:var(--rl);letter-spacing:3px;text-transform:uppercase}
+.dh-live{display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:9px;color:#4ade80;letter-spacing:1px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80,0 0 20px rgba(74,222,128,0.5);animation:livePulse 1.5s infinite}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.7)}}
+
+.dh-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.dkpi{background:rgba(154,63,74,0.06);border:1px solid rgba(154,63,74,0.1);border-radius:10px;padding:12px;text-align:center;transition:all 0.3s;cursor:pointer;position:relative;overflow:hidden}
+.dkpi::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--rl),transparent);opacity:0;transition:opacity 0.3s}
+.dkpi:hover{background:rgba(154,63,74,0.12);border-color:rgba(196,90,103,0.3);box-shadow:0 0 20px rgba(154,63,74,0.12)}.dkpi:hover::before{opacity:1}
+.dkpi-v{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--rl);display:block;text-shadow:0 0 15px rgba(154,63,74,0.4)}
+.dkpi-l{font-family:'DM Mono',monospace;font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-top:3px}
+
+.dh-chart{background:rgba(0,0,0,0.4);border-radius:10px;padding:14px;margin-bottom:16px;border:1px solid rgba(154,63,74,0.06)}
+
+.dh-bars{}
+.dh-bar-title{font-family:'DM Mono',monospace;font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:3px;margin-bottom:10px}
+.dhb{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.dhb-name{font-family:'DM Mono',monospace;font-size:9px;color:var(--text2);min-width:64px}
+.dhb-track{flex:1;height:20px;background:rgba(255,255,255,0.03);border-radius:5px;overflow:hidden;border:1px solid rgba(154,63,74,0.05)}
+.dhb-fill{height:100%;border-radius:5px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:'DM Mono',monospace;font-size:8px;color:rgba(255,255,255,0.8);animation:bfill 1.8s cubic-bezier(.4,0,.2,1) forwards;width:0;position:relative;overflow:hidden}
+.dhb-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08));animation:bshine 2.5s 1.8s infinite}
+@keyframes bfill{to{width:var(--w)}}
+@keyframes bshine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+/* DIVIDER */
+.gdiv{position:relative;z-index:1;height:1px;background:linear-gradient(90deg,transparent,rgba(154,63,74,0.3),rgba(189,104,9,0.3),rgba(154,63,74,0.3),transparent)}
+.gdiv::before{content:'';position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:300px;height:5px;background:linear-gradient(90deg,transparent,var(--r),transparent);filter:blur(6px)}
+
+/* SECTION */
+.sec{position:relative;z-index:1;padding:80px 40px}
+.shead{margin-bottom:56px}
+.seye{font-family:'DM Mono',monospace;font-size:9px;color:var(--rl);letter-spacing:5px;text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.seye::before{content:'';width:24px;height:1px;background:var(--rl);box-shadow:0 0 10px var(--rl)}
+h2{font-family:'Playfair Display',serif;font-size:clamp(26px,3.5vw,48px);font-weight:700;line-height:1.1;margin-bottom:10px}
+h2 em{font-style:italic;color:var(--rl)}
+.ssub{color:var(--text2);font-size:14px;font-weight:300;max-width:480px;line-height:1.7}
+
+/* FILTER BAR */
+.fbar{display:flex;gap:8px;align-items:center;margin-bottom:24px;flex-wrap:wrap;padding:16px 20px;background:rgba(5,10,14,0.6);border:1px solid rgba(154,63,74,0.08);border-radius:12px;backdrop-filter:blur(20px)}
+.flab{font-family:'DM Mono',monospace;font-size:8px;color:var(--text3);letter-spacing:3px;text-transform:uppercase;margin-right:4px}
+.fb{padding:5px 12px;border-radius:100px;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.25s;border:1px solid rgba(154,63,74,0.12);color:var(--text3);background:transparent}
+.fb:hover,.fb.on{background:rgba(154,63,74,0.1);border-color:rgba(154,63,74,0.35);color:var(--rl);box-shadow:0 0 12px rgba(154,63,74,0.12)}
+
+/* STAT ROW */
+.srow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px}
+.sb{background:rgba(5,10,14,0.7);border:1px solid rgba(154,63,74,0.1);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;backdrop-filter:blur(10px)}
+.sb::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--rl),transparent);opacity:0;transition:opacity 0.3s}
+.sb::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--r),var(--p));transform:scaleX(0);transition:transform 0.35s}
+.sb:hover,.sb.sel{border-color:rgba(154,63,74,0.3);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,0.6),0 0 30px rgba(154,63,74,0.08)}.sb:hover::before,.sb.sel::before{opacity:1}.sb:hover::after,.sb.sel::after{transform:scaleX(1)}
+.sv{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--rl);display:block;transition:text-shadow 0.3s}
+.sb:hover .sv,.sb.sel .sv{text-shadow:0 0 25px rgba(154,63,74,0.7)}
+.sl{font-family:'DM Mono',monospace;font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-top:5px}
+.sd{font-size:10px;margin-top:5px;color:var(--gl)}.sd.neg{color:#f87171}
+
+/* GLASS CARDS */
+.glass{background:rgba(5,10,14,0.7);border:1px solid rgba(154,63,74,0.1);border-radius:16px;overflow:hidden;transition:all 0.4s;position:relative;backdrop-filter:blur(20px)}
+.glass::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(154,63,74,0.04) 0%,transparent 50%,rgba(189,104,9,0.02) 100%);pointer-events:none}
+.glass:hover{border-color:rgba(154,63,74,0.25);box-shadow:0 0 60px rgba(154,63,74,0.07),0 30px 80px rgba(0,0,0,0.7);transform:translateY(-4px)}
+.glass-glow{box-shadow:0 0 50px rgba(154,63,74,0.1),inset 0 1px 0 rgba(154,63,74,0.1)}
+
+.ch{padding:20px 22px 16px;border-bottom:1px solid rgba(154,63,74,0.07);display:flex;justify-content:space-between;align-items:flex-start}
+.ct{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:3px}
+.cs{font-size:11px;color:var(--text3)}
+.badge{font-family:'DM Mono',monospace;font-size:8px;padding:4px 10px;border-radius:100px;white-space:nowrap;letter-spacing:1px}
+.badge-r{background:rgba(154,63,74,0.1);color:var(--rl);border:1px solid rgba(154,63,74,0.2)}
+.badge-g{background:rgba(47,71,49,0.12);color:var(--gl);border:1px solid rgba(47,71,49,0.25)}
+.badge-p{background:rgba(189,104,9,0.1);color:var(--pl);border:1px solid rgba(189,104,9,0.2)}
+.cb{padding:22px}
+.ci{padding:12px 18px;background:rgba(154,63,74,0.03);border-top:1px solid rgba(154,63,74,0.07);font-size:11px;color:var(--text2);display:flex;gap:8px;line-height:1.7}
+.ci strong{color:var(--rl)}
+
+/* GRID */
+.dgrid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.dwide{grid-column:1/-1}
+
+/* PLATFORM CARDS */
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pc{background:rgba(5,10,14,0.7);border:1px solid rgba(154,63,74,0.08);border-radius:16px;padding:28px;transition:all 0.4s;cursor:pointer;position:relative;overflow:hidden;backdrop-filter:blur(20px)}
+.pc::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--rl),transparent);opacity:0.6;transition:opacity 0.3s}
+.pc::after{content:'';position:absolute;top:0;right:0;bottom:0;left:0;opacity:0;transition:opacity 0.4s}
+.pc-tt::after{background:radial-gradient(ellipse at top right,rgba(154,63,74,0.07),transparent 60%)}
+.pc-mt::after{background:radial-gradient(ellipse at top right,rgba(189,104,9,0.07),transparent 60%)}
+.pc-gg::after{background:radial-gradient(ellipse at top right,rgba(47,71,49,0.07),transparent 60%)}
+.pc-mt::before{background:linear-gradient(to bottom,var(--pl),transparent)}
+.pc-gg::before{background:linear-gradient(to bottom,var(--gl),transparent)}
+.pc:hover{transform:translateY(-8px);border-color:rgba(154,63,74,0.2)}.pc:hover::after{opacity:1}
+.pc-tt:hover{box-shadow:0 25px 70px rgba(0,0,0,0.7),0 0 40px rgba(154,63,74,0.08)}
+.pc-mt:hover{box-shadow:0 25px 70px rgba(0,0,0,0.7),0 0 40px rgba(189,104,9,0.08);border-color:rgba(189,104,9,0.2)}
+.pc-gg:hover{box-shadow:0 25px 70px rgba(0,0,0,0.7),0 0 40px rgba(47,71,49,0.08);border-color:rgba(47,71,49,0.2)}
+.pc-icon{font-size:40px;margin-bottom:16px;display:block;filter:drop-shadow(0 0 10px rgba(154,63,74,0.3))}
+.pc-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:6px}
+.pc-share{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:20px;letter-spacing:1px}
+.pc-rows{display:flex;flex-direction:column;gap:7px}
+.pc-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(0,0,0,0.4);border-radius:7px;border:1px solid rgba(255,255,255,0.03);transition:background 0.2s}
+.pc:hover .pc-row{background:rgba(0,0,0,0.55)}
+.pc-rn{font-size:11px;color:var(--text3)}
+.pc-rv{font-family:'DM Mono',monospace;font-size:12px;font-weight:500}
+.pc-tt .pc-rv{color:var(--rl)}.pc-mt .pc-rv{color:var(--pl)}.pc-gg .pc-rv{color:var(--gl)}
+.pc-mini{margin-top:16px;height:44px}
+
+/* ROADMAP */
+.rmg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rm{display:flex;gap:16px;align-items:flex-start;padding:18px 22px;background:rgba(5,10,14,0.7);border:1px solid rgba(154,63,74,0.08);border-radius:12px;transition:all 0.3s;backdrop-filter:blur(10px)}
+.rm:hover{border-color:rgba(154,63,74,0.2);transform:translateX(5px)}
+.rm.done{border-left:2px solid var(--r)}.rm.wip{border-left:2px solid var(--p)}.rm.todo{border-left:2px solid rgba(255,255,255,0.05);opacity:0.6}
+.rmd{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.rmd.done{background:rgba(154,63,74,0.12);box-shadow:0 0 15px rgba(154,63,74,0.2)}
+.rmd.wip{background:rgba(189,104,9,0.12);animation:wipg 2s infinite}
+@keyframes wipg{0%,100%{box-shadow:0 0 8px rgba(189,104,9,0.2)}50%{box-shadow:0 0 22px rgba(189,104,9,0.45)}}
+.rmd.todo{background:rgba(255,255,255,0.03)}
+.rmt{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:3px}
+.rms{font-size:11px;color:var(--text3);line-height:1.5}
+.rtag{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:100px;font-size:9px;font-family:'DM Mono',monospace;letter-spacing:1px}
+.rtag.done{background:rgba(154,63,74,0.1);color:var(--rl);border:1px solid rgba(154,63,74,0.2)}
+.rtag.wip{background:rgba(189,104,9,0.1);color:var(--pl);border:1px solid rgba(189,104,9,0.2)}
+.rtag.todo{background:rgba(255,255,255,0.03);color:var(--text3);border:1px solid rgba(255,255,255,0.06)}
+
+/* FOOTER */
+footer{position:relative;z-index:1;background:linear-gradient(180deg,rgba(3,6,8,0) 0%,rgba(20,5,10,0.98) 100%);padding:60px 40px;border-top:1px solid rgba(154,63,74,0.1)}
+.ft{display:flex;justify-content:space-between;align-items:center;margin-bottom:36px}
+.fb2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--cream);margin-bottom:6px}
+.fs{font-size:12px;color:rgba(245,237,224,0.3);font-family:'DM Mono',monospace;letter-spacing:1px}
+.fls{display:flex;gap:18px}
+.fl{color:rgba(245,237,224,0.35);text-decoration:none;font-size:11px;font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;transition:all 0.2s}
+.fl:hover{color:var(--rl);text-shadow:0 0 10px rgba(154,63,74,0.5)}
+.fb3{padding-top:24px;border-top:1px solid rgba(154,63,74,0.08);display:flex;justify-content:space-between;align-items:center}
+.fq{font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:rgba(245,237,224,0.25)}
+
+/* FADE */
+.fu{opacity:0;transform:translateY(28px);transition:opacity 0.9s ease,transform 0.9s ease}
+.fu.vis{opacity:1;transform:translateY(0)}
+.fl2{opacity:0;transform:translateX(-28px);transition:opacity 0.9s ease,transform 0.9s ease}
+.fl2.vis{opacity:1;transform:translateX(0)}
+.fr2{opacity:0;transform:translateX(28px);transition:opacity 0.9s ease,transform 0.9s ease}
+.fr2.vis{opacity:1;transform:translateX(0)}
+.s1{transition-delay:.1s}.s2{transition-delay:.2s}.s3{transition-delay:.3s}.s4{transition-delay:.4s}
+
+@media(max-width:1100px){.hero{grid-template-columns:1fr;padding:80px 24px 40px}.dgrid{grid-template-columns:1fr}.srow{grid-template-columns:repeat(3,1fr)}.pg{grid-template-columns:1fr}.rmg{grid-template-columns:1fr}}
+@media(max-width:768px){nav{padding:0 16px}.nav-pills,.nav-right .nb-g{display:none}.sec{padding:50px 20px}.srow{grid-template-columns:1fr 1fr}.ft{flex-direction:column;gap:20px;text-align:center}.fb3{flex-direction:column;gap:10px;text-align:center}h1{font-size:34px}}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <div class="logo">
+      <div class="logo-ring"><div class="logo-dot"></div></div>
+      <span class="logo-text">Social Media AI</span>
+    </div>
+    <div class="nav-pills">
+      <a href="#metrics" class="np on">Metrics</a>
+      <a href="#analysis" class="np">Analysis</a>
+      <a href="#platforms" class="np">Platforms</a>
+      <a href="#roadmap" class="np">Roadmap</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="https://github.com/data-analyst-ss/social-media-ai" target="_blank" class="nb nb-g">GitHub ↗</a>
+    <a href="https://github.com/data-analyst-ss" target="_blank" class="nb nb-g">Projects ↗</a>
+    <a href="https://www.linkedin.com/in/sarahgleicesilva/" target="_blank" class="nb nb-f">LinkedIn ↗</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="fl2">
+    <div class="hero-tag">AI · Machine Learning · Social Media Intelligence</div>
+    <h1>The <em>Smartest</em><br>Social Media<br><span class="ghost">Dashboard</span></h1>
+    <p class="hero-desc">End-to-end AI campaign intelligence across TikTok, Meta and Google Ads — combining Machine Learning, anomaly detection and LLM-powered insights to maximize ROAS.</p>
+    <div class="hero-stats">
+      <div><span class="hstat-val" id="c1">0</span><span class="hstat-lbl">Campaigns</span></div>
+      <div class="hstat-div"></div>
+      <div><span class="hstat-val">3</span><span class="hstat-lbl">Platforms</span></div>
+      <div class="hstat-div"></div>
+      <div><span class="hstat-val">10.5x</span><span class="hstat-lbl">Avg ROAS</span></div>
+      <div class="hstat-div"></div>
+      <div><span class="hstat-val">5</span><span class="hstat-lbl">Key KPIs</span></div>
+    </div>
+    <div class="hero-btns">
+      <a href="https://github.com/data-analyst-ss/social-media-ai" target="_blank" class="btn btn-fill">View on GitHub ↗</a>
+      <a href="#metrics" class="btn btn-ghost">Explore Data ↓</a>
+    </div>
+  </div>
+
+  <div class="fr2 s2">
+    <div class="hdash">
+      <div class="dh-top">
+        <span class="dh-title">AI Intelligence · Live</span>
+        <div class="dh-live"><div class="live-dot"></div>Analyzing 500+ campaigns</div>
+      </div>
+      <div class="dh-kpis">
+        <div class="dkpi"><span class="dkpi-v">10.5x</span><span class="dkpi-l">Avg ROAS</span></div>
+        <div class="dkpi"><span class="dkpi-v">1.07%</span><span class="dkpi-l">Avg CTR</span></div>
+        <div class="dkpi"><span class="dkpi-v">$2.01</span><span class="dkpi-l">Avg CPC</span></div>
+      </div>
+      <div class="dh-chart"><canvas id="heroSpark" height="100"></canvas></div>
+      <div class="dh-bars">
+        <div class="dh-bar-title">Platform Performance · ROAS</div>
+        <div class="dhb"><span class="dhb-name">🎵 TikTok</span><div class="dhb-track"><div class="dhb-fill" style="--w:88%;background:linear-gradient(90deg,#4a0d16,#9A3F4A,#c45a67)">11.2x</div></div></div>
+        <div class="dhb"><span class="dhb-name">📘 Meta</span><div class="dhb-track"><div class="dhb-fill" style="--w:74%;background:linear-gradient(90deg,#4a2200,#BD6809,#e8852a)">10.8x</div></div></div>
+        <div class="dhb"><span class="dhb-name">🔍 Google</span><div class="dhb-track"><div class="dhb-fill" style="--w:66%;background:linear-gradient(90deg,#0a1a0c,#2F4731,#4a7550)">9.9x</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="gdiv"></div>
+
+<!-- METRICS -->
+<section class="sec" id="metrics">
+  <div class="shead fu">
+    <div class="seye">01 — Live Intelligence</div>
+    <h2>Campaign <em>KPIs</em></h2>
+    <p class="ssub">Click metrics or filters — all 5 charts update together in real time</p>
+  </div>
+
+  <div class="fbar fu s1">
+    <span class="flab">Platform:</span>
+    <button class="fb on" onclick="fP('all',this)">All</button>
+    <button class="fb" onclick="fP('tiktok',this)">🎵 TikTok</button>
+    <button class="fb" onclick="fP('meta',this)">📘 Meta</button>
+    <button class="fb" onclick="fP('google',this)">🔍 Google</button>
+    <span class="flab" style="margin-left:20px">Industry:</span>
+    <button class="fb on" onclick="fI('all',this)">All</button>
+    <button class="fb" onclick="fI('entertainment',this)">Entertainment</button>
+    <button class="fb" onclick="fI('ecommerce',this)">E-commerce</button>
+    <button class="fb" onclick="fI('healthcare',this)">Healthcare</button>
+    <button class="fb" onclick="fI('finance',this)">Finance</button>
+  </div>
+
+  <div class="srow fu s2">
+    <div class="sb sel" onclick="selM(this)"><span class="sv" id="s-roas">10.5x</span><div class="sl">Avg ROAS</div><div class="sd">↑ Max 340x</div></div>
+    <div class="sb" onclick="selM(this)"><span class="sv" id="s-ctr">1.07%</span><div class="sl">Avg CTR</div><div class="sd">↑ Max 34%</div></div>
+    <div class="sb" onclick="selM(this)"><span class="sv" id="s-cpc">$2.01</span><div class="sl">Avg CPC</div><div class="sd neg">$0.02–$73</div></div>
+    <div class="sb" onclick="selM(this)"><span class="sv" id="s-cvr">10.6%</span><div class="sl">Avg CVR</div><div class="sd">↑ Max 340%</div></div>
+    <div class="sb" onclick="selM(this)"><span class="sv" id="s-cpa">$19</span><div class="sl">Avg CPA</div><div class="sd">Min $0.52</div></div>
+  </div>
+
+  <div class="dgrid" id="analysis">
+    <div class="glass glass-glow fu s1">
+      <div class="ch"><div><div class="ct">📈 Revenue vs Spend — Monthly Trend</div><div class="cs">12-month performance with ROAS overlay · Updates with filters</div></div><span class="badge badge-g">Live</span></div>
+      <div class="cb"><canvas id="trendC" height="210"></canvas></div>
+      <div class="ci">💡 <span><strong>Revenue 10x+ spend</strong> consistently. Q4 peaks — October $95K revenue vs $8.9K spend = 10.7x ROAS. Filter by platform to compare.</span></div>
+    </div>
+    <div class="glass fu s2">
+      <div class="ch"><div><div class="ct">🎯 CTR by Platform</div><div class="cs">Click-through distribution</div></div><span class="badge badge-r">3 Platforms</span></div>
+      <div class="cb"><canvas id="ctrC" height="210"></canvas></div>
+      <div class="ci">💡 <span><strong>TikTok leads</strong> at 2.8% CTR — 33% above Google Ads. Short-form video wins engagement.</span></div>
+    </div>
+    <div class="glass fu s2">
+      <div class="ch"><div><div class="ct">🏆 ROAS by Industry</div><div class="cs">Average return per vertical · Click to filter</div></div><span class="badge badge-p">5 Industries</span></div>
+      <div class="cb"><canvas id="roasC" height="210"></canvas></div>
+      <div class="ci">💡 <span><strong>Entertainment leads</strong> at 12.1x — 21% above Finance. Industry selection is a key optimization lever.</span></div>
+    </div>
+    <div class="glass fu s3">
+      <div class="ch"><div><div class="ct">💰 Campaign Distribution</div><div class="cs">ROAS quartile performance</div></div><span class="badge badge-r">500 Campaigns</span></div>
+      <div class="cb"><canvas id="distC" height="210"></canvas></div>
+      <div class="ci">💡 <span><strong>Top 10% = 34x ROAS</strong> vs 4x bottom quartile. ML identifies winners for budget reallocation.</span></div>
+    </div>
+    <div class="glass dwide fu s3">
+      <div class="ch"><div><div class="ct">📊 CPC vs CVR — Efficiency Scatter</div><div class="cs">Each point = 1 campaign · Hover for details · Filters update positions</div></div><span class="badge badge-g">Interactive</span></div>
+      <div class="cb"><canvas id="scatC" height="170"></canvas></div>
+      <div class="ci">💡 <span><strong>Sweet spot: Low CPC + High CVR</strong> (top-left) = best ROI. TikTok clusters higher CVR. Google clusters higher CPC. Use filters to isolate platforms.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="gdiv"></div>
+
+<!-- PLATFORMS -->
+<section class="sec" id="platforms" style="background:rgba(3,6,8,0.96)">
+  <div class="shead fu">
+    <div class="seye">02 — Platform Intelligence</div>
+    <h2>Platform <em>Breakdown</em></h2>
+    <p class="ssub">Deep-dive performance profile per advertising platform — hover to explore</p>
+  </div>
+  <div class="pg">
+    <div class="pc pc-tt fu s1">
+      <span class="pc-icon">🎵</span>
+      <div class="pc-name">TikTok Ads</div><div class="pc-share">35% · 175 campaigns</div>
+      <div class="pc-rows">
+        <div class="pc-row"><span class="pc-rn">Avg ROAS</span><span class="pc-rv">11.2x</span></div>
+        <div class="pc-row"><span class="pc-rn">Avg CTR</span><span class="pc-rv">2.8%</span></div>
+        <div class="pc-row"><span class="pc-rn">Avg CPC</span><span class="pc-rv">$1.85</span></div>
+        <div class="pc-row"><span class="pc-rn">Avg CVR</span><span class="pc-rv">11.4%</span></div>
+        <div class="pc-row"><span class="pc-rn">Best Industry</span><span class="pc-rv">Entertainment</span></div>
+      </div>
+      <div class="pc-mini"><canvas id="ttMini"></canvas></div>
+    </div>
+    <div class="pc pc-mt fu s2">
+      <span class="pc-icon">📘</span>
+      <div class="pc-name">Meta Ads</div><div class="pc-share">35% · 175 campaigns</div>
+      <div class="pc-rows">
+        <div class="pc-row"><span class="pc-rn">Avg ROAS</span><span class="pc-rv">10.8x</span></div>
+        <div class="pc-row"><span class="pc-rn">Avg CTR</span><span class="pc-rv">2.3%</span></div>
+        <div class="pc-row"><span class="pc-rn">Avg CPC</span><span class="pc-rv">$2.10</span></div>
+        <div class="pc-row"><span class="pc-rn">Avg CVR</span><span class="pc-rv">10.8%</span></div>
+        <div class="pc-row"><span class="pc-rn">Best Industry</span><span class="pc-rv">Healthcare</span></div>
+      </div>
+      <div class="pc-mini"><canvas id="mtMini"></canvas></div>
+    </div>
+    <div class="pc pc-gg fu s3">
+      <span class="pc-icon">🔍</span>
+      <div class="pc-name">Google Ads</div><div class="pc-share">30% · 150 campaigns</div>
+      <div class="pc-rows">
+        <div class="pc-row"><span class="pc-rn">Avg ROAS</span><span class="pc-rv">9.9x</span></div>
+        <div class="pc-row"><span class="pc-rn">Avg CTR</span><span class="pc-rv">2.1%</span></div>
+        <div class="pc-row"><span class="pc-rn">Avg CPC</span><span class="pc-rv">$2.45</span></div>
+        <div class="pc-row"><span class="pc-rn">Avg CVR</span><span class="pc-rv">9.8%</span></div>
+        <div class="pc-row"><span class="pc-rn">Best Industry</span><span class="pc-rv">E-commerce</span></div>
+      </div>
+      <div class="pc-mini"><canvas id="ggMini"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<div class="gdiv"></div>
+
+<!-- ROADMAP -->
+<section class="sec" id="roadmap">
+  <div class="shead fu">
+    <div class="seye">03 — Development</div>
+    <h2>Project <em>Roadmap</em></h2>
+    <p class="ssub">From data generation to full AI-powered production system</p>
+  </div>
+  <div class="rmg">
+    <div class="rm done fu s1"><div class="rmd done">✅</div><div><div class="rmt">Data Generation & EDA</div><div class="rms">500+ campaigns · TikTok, Meta, Google · 5 KPIs analyzed</div><span class="rtag done">Completed</span></div></div>
+    <div class="rm done fu s2"><div class="rmd done">✅</div><div><div class="rmt">Interactive Visualizations</div><div class="rms">Chart.js + Plotly · ROAS trends, scatter, platform comparison</div><span class="rtag done">Completed</span></div></div>
+    <div class="rm wip fu s1"><div class="rmd wip">⚡</div><div><div class="rmt">Real Dataset Integration</div><div class="rms">Kaggle public ad performance data replacing simulated records</div><span class="rtag wip">In Progress</span></div></div>
+    <div class="rm todo fu s2"><div class="rmd todo">○</div><div><div class="rmt">ROAS Prediction — XGBoost</div><div class="rms">Predict ROAS before budget allocation · Proactive optimization</div><span class="rtag todo">Planned</span></div></div>
+    <div class="rm todo fu s1"><div class="rmd todo">○</div><div><div class="rmt">Anomaly Detection</div><div class="rms">Isolation Forest · Auto-flag underperforming campaigns</div><span class="rtag todo">Planned</span></div></div>
+    <div class="rm todo fu s2"><div class="rmd todo">○</div><div><div class="rmt">AI Insights — OpenAI API</div><div class="rms">LLM-generated optimization recommendations per campaign</div><span class="rtag todo">Planned</span></div></div>
+    <div class="rm todo fu s1"><div class="rmd todo">○</div><div><div class="rmt">Streamlit Live Dashboard</div><div class="rms">Production app · Filterable by platform, industry, date, budget</div><span class="rtag todo">Planned</span></div></div>
+    <div class="rm todo fu s2"><div class="rmd todo">○</div><div><div class="rmt">MLOps Pipeline</div><div class="rms">MLflow versioning · GitHub Actions CI/CD · Auto-retraining</div><span class="rtag todo">Planned</span></div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="ft">
+    <div><div class="fb2">Sarah Silva</div><div class="fs">Senior Data & AI Engineer · Harvard · TikTok · Globo · WPP</div></div>
+    <div class="fls">
+      <a href="https://github.com/data-analyst-ss/social-media-ai" target="_blank" class="fl">GitHub ↗</a>
+      <a href="https://github.com/data-analyst-ss" target="_blank" class="fl">All Projects ↗</a>
+      <a href="https://data-analyst-ss.github.io/ml-portfolio-R" target="_blank" class="fl">ML Portfolio ↗</a>
+      <a href="https://www.linkedin.com/in/sarahgleicesilva/" target="_blank" class="fl">LinkedIn ↗</a>
+    </div>
+  </div>
+  <div class="fb3">
+    <span class="fq">"I don't just analyze data — I engineer intelligence that drives revenue."</span>
+    <span style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(245,237,224,0.18)">Python · Chart.js · ML · AI · Sarah Silva 2026</span>
+  </div>
+</footer>
+
+<script>
+// ANIMATED BACKGROUND CANVAS
+const bgC=document.getElementById('bgCanvas'),bgX=bgC.getContext('2d');
+bgC.width=window.innerWidth;bgC.height=window.innerHeight;
+window.addEventListener('resize',()=>{bgC.width=window.innerWidth;bgC.height=window.innerHeight});
+const pts=Array.from({length:90},()=>({
+  x:Math.random()*bgC.width,y:Math.random()*bgC.height,
+  r:Math.random()*1.8+0.3,dx:(Math.random()-.5)*.35,dy:(Math.random()-.5)*.35,
+  op:Math.random()*.6+0.1,c:['154,63,74','189,104,9','47,71,49'][Math.floor(Math.random()*3)]
+}));
+function animBG(){
+  bgX.clearRect(0,0,bgC.width,bgC.height);
+  pts.forEach(p=>{
+    p.x+=p.dx;p.y+=p.dy;
+    if(p.x<0||p.x>bgC.width)p.dx*=-1;
+    if(p.y<0||p.y>bgC.height)p.dy*=-1;
+    bgX.beginPath();bgX.arc(p.x,p.y,p.r,0,Math.PI*2);
+    bgX.fillStyle=`rgba(${p.c},${p.op})`;bgX.fill();
+  });
+  pts.forEach((p1,i)=>pts.slice(i+1).forEach(p2=>{
+    const d=Math.hypot(p1.x-p2.x,p1.y-p2.y);
+    if(d<110){bgX.beginPath();bgX.moveTo(p1.x,p1.y);bgX.lineTo(p2.x,p2.y);bgX.strokeStyle=`rgba(154,63,74,${.055*(1-d/110)})`;bgX.lineWidth=.6;bgX.stroke()}
+  }));
+  requestAnimationFrame(animBG);
+}
+animBG();
+
+// FADE OBSERVER
+const obs=new IntersectionObserver(es=>es.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('vis'),i*70);obs.unobserve(e.target)}}),{threshold:0.05});
+document.querySelectorAll('.fu,.fl2,.fr2').forEach(el=>obs.observe(el));
+
+// COUNTER
+function cnt(el,t,s=''){let st=0;const f=ts=>{if(!st)st=ts;const p=Math.min((ts-st)/2000,1),e=1-Math.pow(1-p,3);el.textContent=Math.floor(e*t)+s;if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
+setTimeout(()=>{const c=document.getElementById('c1');if(c)cnt(c,500,'+')},700);
+
+// NAV
+document.querySelectorAll('.np').forEach(p=>p.addEventListener('click',()=>{document.querySelectorAll('.np').forEach(x=>x.classList.remove('on'));p.classList.add('on')}));
+window.addEventListener('scroll',()=>{
+  ['metrics','analysis','platforms','roadmap'].forEach((s,i)=>{
+    const el=document.getElementById(s),pills=document.querySelectorAll('.np');
+    if(el){const r=el.getBoundingClientRect();if(r.top<=80&&r.bottom>80){pills.forEach(p=>p.classList.remove('on'));if(pills[i])pills[i].classList.add('on')}}
+  });
+});
+
+// CHART DEFAULTS
+Chart.defaults.color='#6a5a4a';Chart.defaults.borderColor='rgba(154,63,74,0.08)';Chart.defaults.font.family='DM Sans';
+Chart.defaults.plugins.tooltip.backgroundColor='rgba(3,6,8,0.95)';
+Chart.defaults.plugins.tooltip.borderColor='rgba(154,63,74,0.3)';
+Chart.defaults.plugins.tooltip.borderWidth=1;
+Chart.defaults.plugins.tooltip.titleColor='#c45a67';
+Chart.defaults.plugins.tooltip.bodyColor='#c4b49a';
+Chart.defaults.plugins.tooltip.padding=12;Chart.defaults.plugins.tooltip.cornerRadius=10;
+
+// DATA
+const MOS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const REV=[42,38,55,61,58,72,68,75,80,95,102,88];
+const SPD=[4.2,3.8,5.1,5.8,5.4,6.8,6.2,7.1,7.5,8.9,9.5,8.2];
+const RM=REV.map((r,i)=>(r/SPD[i]).toFixed(1));
+const ROAS_IND=[10.0,10.5,11.1,11.5,12.1];
+const IND_LABS=['Finance','E-commerce','Travel','Healthcare','Entertainment'];
+
+// HERO SPARKLINE
+new Chart(document.getElementById('heroSpark'),{type:'line',data:{labels:MOS,datasets:[
+  {data:REV,borderColor:'rgba(154,63,74,0.9)',backgroundColor:'rgba(154,63,74,0.07)',borderWidth:1.5,pointRadius:0,fill:true,tension:0.4},
+  {data:RM.map(r=>r*4.5),borderColor:'rgba(189,104,9,0.6)',backgroundColor:'transparent',borderWidth:1,pointRadius:0,fill:false,tension:0.4,borderDash:[4,3]}
+]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}},animation:{duration:2500,easing:'easeInOutQuart'}}});
+
+// TREND CHART
+const trendC=new Chart(document.getElementById('trendC'),{type:'line',data:{labels:MOS,datasets:[
+  {label:'Revenue ($K)',data:[...REV],borderColor:'#9A3F4A',backgroundColor:'rgba(154,63,74,0.08)',borderWidth:2.5,fill:true,tension:0.4,pointRadius:5,pointBackgroundColor:'#9A3F4A',pointBorderColor:'rgba(154,63,74,0.2)',pointHoverRadius:8,pointHoverBackgroundColor:'#c45a67'},
+  {label:'Spend ($K)',data:[...SPD],borderColor:'#BD6809',backgroundColor:'rgba(189,104,9,0.06)',borderWidth:2,fill:true,tension:0.4,pointRadius:5,pointBackgroundColor:'#BD6809',pointBorderColor:'rgba(189,104,9,0.2)',pointHoverRadius:8},
+  {label:'ROAS',data:[...RM],borderColor:'rgba(74,117,80,0.75)',backgroundColor:'transparent',borderWidth:1.5,fill:false,tension:0.4,pointRadius:3,pointBackgroundColor:'#4a7550',borderDash:[6,3],yAxisID:'y2'}
+]},options:{responsive:true,interaction:{intersect:false,mode:'index'},plugins:{legend:{position:'bottom',labels:{padding:16,usePointStyle:true,pointStyleWidth:10,font:{size:11}}}},scales:{x:{grid:{color:'rgba(154,63,74,0.04)'},ticks:{font:{size:10}}},y:{grid:{color:'rgba(154,63,74,0.04)'},ticks:{callback:v=>'$'+v+'K',font:{size:10}}},y2:{position:'right',grid:{display:false},ticks:{callback:v=>v+'x',font:{size:10}},min:0,max:18}},animation:{duration:1500,easing:'easeInOutQuart'}}});
+
+// CTR DONUT
+const ctrC=new Chart(document.getElementById('ctrC'),{type:'doughnut',data:{labels:['TikTok (2.8%)','Meta (2.3%)','Google (2.1%)'],datasets:[{data:[2.8,2.3,2.1],backgroundColor:['rgba(154,63,74,0.82)','rgba(189,104,9,0.82)','rgba(47,71,49,0.82)'],borderColor:['#9A3F4A','#BD6809','#2F4731'],borderWidth:2,hoverOffset:12,hoverBackgroundColor:['rgba(196,90,103,0.95)','rgba(232,133,42,0.95)','rgba(74,117,80,0.95)']}]},options:{responsive:true,cutout:'62%',plugins:{legend:{position:'bottom',labels:{padding:14,usePointStyle:true,pointStyleWidth:10,font:{size:11}}},tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw}% avg CTR`}}},animation:{animateRotate:true,duration:1800}}});
+
+// ROAS BAR
+const roasC=new Chart(document.getElementById('roasC'),{type:'bar',data:{labels:IND_LABS,datasets:[{label:'Avg ROAS',data:[...ROAS_IND],backgroundColor:['rgba(47,71,49,0.5)','rgba(189,104,9,0.55)','rgba(189,104,9,0.72)','rgba(154,63,74,0.65)','rgba(154,63,74,0.92)'],borderColor:['#2F4731','#BD6809','#BD6809','#9A3F4A','#9A3F4A'],borderWidth:1,borderRadius:8,hoverBackgroundColor:['rgba(47,71,49,0.8)','rgba(189,104,9,0.88)','rgba(189,104,9,0.95)','rgba(154,63,74,0.85)','rgba(196,90,103,1)']}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(154,63,74,0.04)'},ticks:{font:{size:10}}},y:{grid:{color:'rgba(154,63,74,0.04)'},min:9,ticks:{callback:v=>v+'x',font:{size:10}}}},animation:{duration:1600,easing:'easeInOutBounce'}}});
+
+// DIST BAR
+const distC=new Chart(document.getElementById('distC'),{type:'bar',data:{labels:['Bottom 25%','Median 50%','Top 25%','Top 10%'],datasets:[{label:'ROAS',data:[4,10,21,34],backgroundColor:['rgba(47,71,49,0.45)','rgba(189,104,9,0.6)','rgba(154,63,74,0.72)','rgba(154,63,74,0.95)'],borderColor:['#2F4731','#BD6809','#9A3F4A','#c45a67'],borderWidth:1,borderRadius:8}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(154,63,74,0.04)'},ticks:{font:{size:10}}},y:{grid:{color:'rgba(154,63,74,0.04)'},ticks:{callback:v=>v+'x',font:{size:10}}}},animation:{duration:1500}}});
+
+// SCATTER
+const sData=Array.from({length:90},()=>({x:+(Math.random()*8+.4).toFixed(2),y:+(Math.random()*28+1).toFixed(1),p:['TikTok','Meta','Google'][Math.floor(Math.random()*3)]}));
+let scatC=new Chart(document.getElementById('scatC'),{type:'scatter',data:{datasets:[
+  {label:'TikTok',data:sData.filter(d=>d.p==='TikTok').map(d=>({x:d.x,y:d.y})),backgroundColor:'rgba(154,63,74,0.65)',borderColor:'rgba(196,90,103,0.8)',pointRadius:5,pointHoverRadius:9,borderWidth:1},
+  {label:'Meta',data:sData.filter(d=>d.p==='Meta').map(d=>({x:d.x,y:d.y})),backgroundColor:'rgba(189,104,9,0.65)',borderColor:'rgba(232,133,42,0.8)',pointRadius:5,pointHoverRadius:9,borderWidth:1},
+  {label:'Google',data:sData.filter(d=>d.p==='Google').map(d=>({x:d.x,y:d.y})),backgroundColor:'rgba(47,71,49,0.65)',borderColor:'rgba(74,117,80,0.8)',pointRadius:5,pointHoverRadius:9,borderWidth:1}
+]},options:{responsive:true,interaction:{mode:'nearest',intersect:true},plugins:{legend:{position:'bottom',labels:{padding:14,usePointStyle:true,font:{size:11}}}},scales:{x:{title:{display:true,text:'CPC ($)',color:'#6a5a4a',font:{size:11}},grid:{color:'rgba(154,63,74,0.04)'}},y:{title:{display:true,text:'CVR (%)',color:'#6a5a4a',font:{size:11}},grid:{color:'rgba(154,63,74,0.04)'}}},animation:{duration:1200}}});
+
+// MINI CHARTS
+function mini(id,data,c){new Chart(document.getElementById(id),{type:'line',data:{labels:['J','F','M','A','M','J'],datasets:[{data,borderColor:c,backgroundColor:c.replace('1)','0.08)'),borderWidth:1.5,pointRadius:0,fill:true,tension:0.4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}},animation:{duration:2000}}})}
+mini('ttMini',[9.8,10.5,11.0,10.8,11.5,11.2],'rgba(154,63,74,1)');
+mini('mtMini',[9.5,10.0,10.5,10.2,11.0,10.8],'rgba(189,104,9,1)');
+mini('ggMini',[8.8,9.2,9.8,9.5,10.1,9.9],'rgba(47,71,49,1)');
+
+// FILTER STATE
+let cP='all',cI='all';
+const PM={all:1,tiktok:1.07,meta:0.97,google:0.94};
+const IM={all:1,entertainment:1.15,ecommerce:1.02,healthcare:1.09,finance:0.95};
+
+function fP(p,btn){cP=p;document.querySelectorAll('.fbar .fb').forEach((b,i)=>{if(i<4)b.classList.remove('on')});btn.classList.add('on');upd()}
+function fI(i,btn){cI=i;const bs=[...document.querySelectorAll('.fbar .fb')];bs.slice(4).forEach(b=>b.classList.remove('on'));btn.classList.add('on');upd()}
+
+function upd(){
+  const m=PM[cP]*IM[cI];
+  // Stats
+  document.getElementById('s-roas').textContent=(10.5*m).toFixed(1)+'x';
+  document.getElementById('s-ctr').textContent=(1.07*m).toFixed(2)+'%';
+  document.getElementById('s-cpc').textContent='$'+(2.01/m).toFixed(2);
+  document.getElementById('s-cvr').textContent=(10.6*m).toFixed(1)+'%';
+  document.getElementById('s-cpa').textContent='$'+Math.round(19/m);
+  // Trend
+  trendC.data.datasets[0].data=REV.map(r=>+(r*m).toFixed(1));
+  trendC.data.datasets[2].data=RM.map(r=>+(r*m).toFixed(1));
+  trendC.update('active');
+  // ROAS bar
+  roasC.data.datasets[0].data=ROAS_IND.map(v=>+(v*m).toFixed(1));
+  roasC.update('active');
+  // Scatter
+  const nd=sData.map(d=>({...d,y:+(d.y*m).toFixed(1)}));
+  scatC.data.datasets[0].data=nd.filter(d=>d.p==='TikTok').map(d=>({x:d.x,y:d.y}));
+  scatC.data.datasets[1].data=nd.filter(d=>d.p==='Meta').map(d=>({x:d.x,y:d.y}));
+  scatC.data.datasets[2].data=nd.filter(d=>d.p==='Google').map(d=>({x:d.x,y:d.y}));
+  scatC.update('active');
+}
+
+function selM(el){document.querySelectorAll('.sb').forEach(b=>b.classList.remove('sel'));el.classList.add('sel')}
+</script>
+</body>
+</html>

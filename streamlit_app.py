@@ -19,8 +19,6 @@ st.set_page_config(
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@200;300;400;500&family=DM+Mono:wght@300;400&display=swap');
-
-/* ─── RESET ─────────────────────────────────────────── */
 html, body, [class*="css"], .stApp {
     background-color: #111416 !important;
     color: #e8e0d6 !important;
@@ -29,8 +27,6 @@ html, body, [class*="css"], .stApp {
 }
 #MainMenu, footer, header { visibility: hidden; }
 .block-container { padding: 0 !important; max-width: 100% !important; }
-
-/* ─── GRAIN TEXTURE ──────────────────────────────────── */
 .stApp::before {
     content: '';
     position: fixed;
@@ -40,8 +36,6 @@ html, body, [class*="css"], .stApp {
     z-index: 999;
     opacity: 0.4;
 }
-
-/* ─── SIDEBAR ────────────────────────────────────────── */
 [data-testid="stSidebar"] {
     background: #0d1012 !important;
     border-right: 1px solid rgba(212,139,139,0.08) !important;
@@ -54,8 +48,6 @@ html, body, [class*="css"], .stApp {
     text-transform: uppercase !important;
     color: #5a5046 !important;
 }
-
-/* ─── SELECTBOX ──────────────────────────────────────── */
 [data-baseweb="select"] > div {
     background: rgba(13,16,18,0.8) !important;
     border: none !important;
@@ -70,8 +62,6 @@ html, body, [class*="css"], .stApp {
 [data-baseweb="select"] > div:hover {
     border-bottom-color: rgba(212,139,139,0.4) !important;
 }
-
-/* ─── METRICS ────────────────────────────────────────── */
 [data-testid="metric-container"] {
     background: transparent !important;
     border: none !important;
@@ -98,8 +88,6 @@ html, body, [class*="css"], .stApp {
     font-size: 11px !important;
     font-weight: 300 !important;
 }
-
-/* ─── TABS ───────────────────────────────────────────── */
 .stTabs [data-baseweb="tab-list"] {
     background: transparent !important;
     border-bottom: 1px solid rgba(212,139,139,0.1) !important;
@@ -124,8 +112,6 @@ html, body, [class*="css"], .stApp {
     border-bottom: 1px solid #D48B8B !important;
     background: transparent !important;
 }
-
-/* ─── BUTTONS ────────────────────────────────────────── */
 .stButton > button {
     background: transparent !important;
     color: #D48B8B !important;
@@ -143,8 +129,6 @@ html, body, [class*="css"], .stApp {
     border-color: rgba(212,139,139,0.6) !important;
     color: #e8b8b8 !important;
 }
-
-/* ─── SLIDER ─────────────────────────────────────────── */
 .stSlider [data-baseweb="slider"] { color: #D48B8B !important; }
 .stSlider label {
     font-family: 'DM Mono', monospace !important;
@@ -153,8 +137,6 @@ html, body, [class*="css"], .stApp {
     text-transform: uppercase !important;
     color: #5a5046 !important;
 }
-
-/* ─── NUMBER INPUT ───────────────────────────────────── */
 .stNumberInput input {
     background: transparent !important;
     border: none !important;
@@ -172,32 +154,26 @@ html, body, [class*="css"], .stApp {
     text-transform: uppercase !important;
     color: #5a5046 !important;
 }
-
-/* ─── DATAFRAME ──────────────────────────────────────── */
 [data-testid="stDataFrame"] {
     background: transparent !important;
     border: none !important;
     border-top: 1px solid rgba(212,139,139,0.08) !important;
 }
-
-/* ─── DIVIDER ────────────────────────────────────────── */
 hr { border-color: rgba(212,139,139,0.08) !important; }
-
-/* ─── SUCCESS/WARNING/ERROR ──────────────────────────── */
-.stSuccess { 
-    background: rgba(80,100,80,0.08) !important; 
+.stSuccess {
+    background: rgba(80,100,80,0.08) !important;
     border: none !important;
     border-left: 2px solid #7a9a7a !important;
     border-radius: 0 !important;
 }
-.stWarning { 
-    background: rgba(197,160,89,0.06) !important; 
+.stWarning {
+    background: rgba(197,160,89,0.06) !important;
     border: none !important;
     border-left: 2px solid #C5A059 !important;
     border-radius: 0 !important;
 }
-.stError { 
-    background: rgba(212,139,139,0.06) !important; 
+.stError {
+    background: rgba(212,139,139,0.06) !important;
     border: none !important;
     border-left: 2px solid #D48B8B !important;
     border-radius: 0 !important;
@@ -205,7 +181,6 @@ hr { border-color: rgba(212,139,139,0.08) !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# ── DATA ──────────────────────────────────────────────────────
 @st.cache_data
 def load_data():
     df = pd.read_csv('data/global_ads_performance_dataset.csv')
@@ -221,7 +196,14 @@ COUNTRY_ISO = {
     'Germany':'DEU','Canada':'CAN','India':'IND','Australia':'AUS'
 }
 
-# Luxury layout for charts
+# ── TOOLTIP STYLE — applied to ALL charts ──────────────────────
+HOVER = dict(
+    bgcolor='white',
+    font_size=13,
+    font_color='#1C1C1C',
+    bordercolor='#CCCCCC'
+)
+
 LAY = dict(
     template='plotly_dark',
     paper_bgcolor='rgba(13,16,18,0)',
@@ -229,6 +211,7 @@ LAY = dict(
     font=dict(family='Inter', color='#8a8078', size=11),
     title_font=dict(family='Playfair Display', size=16, color='#e8e0d6'),
     margin=dict(l=8, r=8, t=48, b=16),
+    hoverlabel=dict(bgcolor='white', font_size=13, font_color='#1C1C1C', bordercolor='#CCCCCC'),
     legend=dict(
         bgcolor='rgba(13,16,18,0.6)',
         bordercolor='rgba(212,139,139,0.1)',
@@ -261,7 +244,6 @@ PLAT_COLORS = {
     'Google Ads': '#7a9a7a'
 }
 
-# ── SIDEBAR ────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("""
     <div style='padding:32px 20px 24px;border-bottom:1px solid rgba(212,139,139,0.08)'>
@@ -304,7 +286,6 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-# ── FILTER ────────────────────────────────────────────────────
 dff = df.copy()
 if sel_plat != 'All': dff = dff[dff['platform'] == sel_plat]
 if sel_ind  != 'All': dff = dff[dff['industry']  == sel_ind]
@@ -313,7 +294,6 @@ if sel_camp != 'All': dff = dff[dff['campaign_type'] == sel_camp]
 
 is_filtered = any(x != 'All' for x in [sel_plat, sel_ind, sel_ctry, sel_camp])
 
-# ── HEADER ────────────────────────────────────────────────────
 best_plat = df.groupby('platform')['ROAS'].mean().idxmax()
 best_ind  = df.groupby('industry')['ROAS'].mean().idxmax()
 
@@ -337,8 +317,6 @@ components.html(f"""
 </div>
 """, height=200, scrolling=False)
 
-# ── KPIs ──────────────────────────────────────────────────────
-# LUXURY KPI CARDS — using components.html for guaranteed rendering
 avg_roas = dff['ROAS'].mean()
 avg_roas_all = df['ROAS'].mean()
 roas_delta = ((avg_roas - avg_roas_all) / avg_roas_all * 100)
@@ -389,7 +367,6 @@ _kpi_html = f"""
 """
 components.html(_kpi_html, height=230, scrolling=False)
 
-# ── NARRATIVE INSIGHT ─────────────────────────────────────────
 if is_filtered:
     _tail = f'Current filter shows <strong style="color:#C5A059;font-weight:400">{avg_roas:.2f}x</strong> average ROAS &mdash; {abs(roas_delta):.1f}% {"above" if roas_delta >= 0 else "below"} the overall dataset average.'
 else:
@@ -407,7 +384,6 @@ _insight_html = f"""
 """
 components.html(_insight_html, height=90, scrolling=False)
 
-# ── TABS ──────────────────────────────────────────────────────
 tab1,tab2,tab3,tab4,tab5 = st.tabs([
     "◎  World Map",
     "◎  Performance",
@@ -432,9 +408,7 @@ def insight_box(text):
     </div>
     """, unsafe_allow_html=True)
 
-# ════════════════════════════════════════════════════════════
-# TAB 1 — WORLD MAP
-# ════════════════════════════════════════════════════════════
+# ════════════════ TAB 1 — WORLD MAP ════════════════
 with tab1:
     st.markdown("<div style='padding:8px 48px 32px'>", unsafe_allow_html=True)
     section_title("Global Campaign Intelligence", "Heatmap · 7 international markets · 2024")
@@ -470,12 +444,8 @@ with tab1:
     fig_map = go.Figure(go.Choropleth(
         locations=ctry['iso'], z=ctry[col], text=ctry['country'],
         colorscale=[
-            [0.0, '#0d1012'],
-            [0.2, '#1a1014'],
-            [0.4, '#3d1f1f'],
-            [0.6, '#8B4545'],
-            [0.8, '#D48B8B'],
-            [1.0, '#f0c8c8'],
+            [0.0, '#0d1012'],[0.2, '#1a1014'],[0.4, '#3d1f1f'],
+            [0.6, '#8B4545'],[0.8, '#D48B8B'],[1.0, '#f0c8c8'],
         ],
         marker_line_color='rgba(212,139,139,0.15)',
         marker_line_width=0.8,
@@ -484,11 +454,9 @@ with tab1:
             tickfont=dict(color='#5a5046', size=9, family='DM Mono'),
             bgcolor='rgba(13,16,18,0.8)',
             bordercolor='rgba(212,139,139,0.1)',
-            borderwidth=1,
-            thickness=10,
-            len=0.5,
+            borderwidth=1, thickness=10, len=0.5,
         ),
-        hovertemplate='<b style="font-family:Playfair Display">%{text}</b><br>' + label + ': %{z:.2f}<extra></extra>',
+        hovertemplate='<b>%{text}</b><br>' + label + ': %{z:.2f}<extra></extra>',
     ))
     fig_map.update_geos(
         showframe=False,
@@ -501,6 +469,7 @@ with tab1:
         projection_type='natural earth',
     )
     fig_map.update_layout(
+        hoverlabel=dict(bgcolor='white', font_size=13, font_color='#1C1C1C', bordercolor='#CCCCCC'),
         paper_bgcolor='rgba(13,16,18,0)',
         geo_bgcolor='rgba(0,0,0,0)',
         font=dict(family='Inter', color='#8a8078'),
@@ -513,7 +482,6 @@ with tab1:
     st.plotly_chart(fig_map, use_container_width=True)
     insight_box(f"<strong style='color:#e8e0d6'>{desc}</strong>. Darker pink = higher {label}. Countries without color had no campaigns in the current selection. Hover for exact values.")
 
-    # Country sparklines
     c1, c2 = st.columns([1,1])
     with c1:
         section_title("Country Ranking", "Sorted by Return on Ad Spend")
@@ -541,7 +509,6 @@ with tab1:
         )
         st.plotly_chart(fig_bar, use_container_width=True)
 
-    # Radar
     section_title("Multi-Metric Country Radar", "Normalized performance across all dimensions")
     radar = dff.groupby('country').agg(
         roas=('ROAS','mean'), ctr=('CTR','mean'),
@@ -567,6 +534,7 @@ with tab1:
             name=row['country'],
         ))
     fig_r.update_layout(
+        hoverlabel=dict(bgcolor='white', font_size=13, font_color='#1C1C1C', bordercolor='#CCCCCC'),
         polar=dict(
             bgcolor='rgba(13,16,18,0)',
             radialaxis=dict(visible=True,range=[0,1],gridcolor='rgba(212,139,139,0.08)',tickfont=dict(color='#4a4038',size=8,family='DM Mono'),linecolor='rgba(212,139,139,0.08)'),
@@ -582,9 +550,7 @@ with tab1:
     st.markdown("</div>", unsafe_allow_html=True)
 
 
-# ════════════════════════════════════════════════════════════
-# TAB 2 — PERFORMANCE
-# ════════════════════════════════════════════════════════════
+# ════════════════ TAB 2 — PERFORMANCE ════════════════
 with tab2:
     st.markdown("<div style='padding:8px 48px 32px'>", unsafe_allow_html=True)
     section_title("Revenue & Spend Over Time", "Monthly trend · All platforms")
@@ -610,14 +576,12 @@ with tab2:
 
     c1,c2 = st.columns(2)
     with c1:
-        # Range plot (reimagined box plot)
-        section_title("ROAS Range by Platform", "Min · Average · Max — reimagined")
+        section_title("ROAS Range by Platform", "Min · Average · Max")
         plat_s = dff.groupby('platform')['ROAS'].agg(['min','mean','max','std']).reset_index()
         fig_range = go.Figure()
         for i, (_, row) in enumerate(plat_s.iterrows()):
             color = PLAT_COLORS.get(row['platform'], ROSE)
             r,g,b = int(color[1:3],16),int(color[3:5],16),int(color[5:7],16)
-            # Range bar
             fig_range.add_trace(go.Bar(
                 name=row['platform'], x=[row['platform']],
                 y=[row['max']-row['min']], base=[row['min']],
@@ -625,7 +589,6 @@ with tab2:
                 marker_line_width=0, showlegend=False,
                 hoverinfo='skip'
             ))
-            # Mean point
             fig_range.add_trace(go.Scatter(
                 x=[row['platform']], y=[row['mean']],
                 mode='markers+text',
@@ -643,7 +606,7 @@ with tab2:
             'xaxis':dict(gridcolor='rgba(0,0,0,0)', tickfont=dict(size=11,family='DM Mono'))
         })
         st.plotly_chart(fig_range, use_container_width=True)
-        insight_box("The <strong style='color:#e8e0d6'>glowing dot</strong> = average ROAS. The bar = the full range from worst to best campaign. Wider bar = more variance in results.")
+        insight_box("The <strong style='color:#e8e0d6'>glowing dot</strong> = average ROAS. The bar = the full range from worst to best campaign.")
 
     with c2:
         section_title("Efficiency Map", "Cost per Click vs Return · Bubble = Budget")
@@ -660,9 +623,8 @@ with tab2:
                     size=sub['ad_spend']/sub['ad_spend'].max()*20+4,
                     line=dict(color=f'rgba({r},{g},{b},0.8)', width=0.5)
                 ),
-                hovertemplate=f'<b>{plat}</b><br>CPC: $%{{x:.2f}}<br>ROAS: %{{y:.2f}}×<br><extra></extra>'
+                hovertemplate=f'<b>{plat}</b><br>CPC: $%{{x:.2f}}<br>ROAS: %{{y:.2f}}×<extra></extra>'
             ))
-        # Quadrant labels
         cpc_m, roas_m = samp['CPC'].median(), samp['ROAS'].median()
         fig_sc.add_hline(y=roas_m, line_dash='dot', line_color='rgba(197,160,89,0.2)', line_width=1)
         fig_sc.add_vline(x=cpc_m, line_dash='dot', line_color='rgba(197,160,89,0.2)', line_width=1)
@@ -675,17 +637,13 @@ with tab2:
             'yaxis':dict(title='Return on Ad Spend (×)', gridcolor='rgba(212,139,139,0.05)', tickfont=dict(size=10,family='DM Mono'))
         })
         st.plotly_chart(fig_sc, use_container_width=True)
-        insight_box("<strong style='color:#e8e0d6'>Best campaigns: top-left</strong> (low cost, high return). The gold dashed lines split into 4 quadrants. The ★ Sweet Spot is where you want your campaigns to live.")
+        insight_box("<strong style='color:#e8e0d6'>Best campaigns: top-left</strong> (low cost, high return). The ★ Sweet Spot is where you want your campaigns to live.")
     st.markdown("</div>", unsafe_allow_html=True)
 
 
-# ════════════════════════════════════════════════════════════
-# TAB 3 — PLATFORM & INDUSTRY
-# ════════════════════════════════════════════════════════════
+# ════════════════ TAB 3 — PLATFORM & INDUSTRY ════════════════
 with tab3:
     st.markdown("<div style='padding:8px 48px 32px'>", unsafe_allow_html=True)
-
-    # Platform radar
     section_title("Platform Intelligence", "Multi-metric comparison · Normalized scores")
     plat_r = dff.groupby('platform').agg(
         roas=('ROAS','mean'), ctr=('CTR','mean'), cpc=('CPC','mean'),
@@ -711,6 +669,7 @@ with tab3:
             name=row['platform'],
         ))
     fig_r2.update_layout(
+        hoverlabel=dict(bgcolor='white', font_size=13, font_color='#1C1C1C', bordercolor='#CCCCCC'),
         polar=dict(
             bgcolor='rgba(13,16,18,0)',
             radialaxis=dict(visible=True,range=[0,1],gridcolor='rgba(212,139,139,0.08)',tickfont=dict(color='#4a4038',size=8,family='DM Mono'),linecolor='rgba(212,139,139,0.08)'),
@@ -762,18 +721,15 @@ with tab3:
     st.markdown("</div>", unsafe_allow_html=True)
 
 
-# ════════════════════════════════════════════════════════════
-# TAB 4 — ANOMALY DETECTION
-# ════════════════════════════════════════════════════════════
+# ════════════════ TAB 4 — ANOMALY DETECTION ════════════════
 with tab4:
     st.markdown("<div style='padding:8px 48px 32px'>", unsafe_allow_html=True)
     section_title("AI Anomaly Detection", "Isolation Forest · Unsupervised machine learning")
 
     st.markdown("""
     <div style='font-family:Inter,sans-serif;font-size:12px;color:#5a5046;font-weight:300;line-height:1.8;max-width:600px;margin-bottom:24px'>
-        The model learns what "normal" looks like across all 14 campaign dimensions — 
-        then flags anything that deviates significantly. Think of it as an AI auditor 
-        reviewing every campaign before you waste budget.
+        The model learns what "normal" looks like across all campaign dimensions —
+        then flags anything that deviates significantly.
     </div>
     """, unsafe_allow_html=True)
 
@@ -796,14 +752,13 @@ with tab4:
     wasted = dff2[dff2['_anom']==-1]['ad_spend'].sum()
 
     a1,a2,a3,a4 = st.columns(4)
-    with a1: st.metric("Normal Campaigns", f"{n_norm:,}", help="Performing within expected range")
-    with a2: st.metric("Flagged for Review", f"{n_anom:,}", help="AI detected unusual behavior")
+    with a1: st.metric("Normal Campaigns", f"{n_norm:,}")
+    with a2: st.metric("Flagged for Review", f"{n_anom:,}")
     with a3: st.metric("Flag Rate", f"{n_anom/len(dff2)*100:.1f}%")
-    with a4: st.metric("Budget at Risk", f"${wasted:,.0f}", help="Total spend in flagged campaigns")
+    with a4: st.metric("Budget at Risk", f"${wasted:,.0f}")
 
-    # Glassmorphism scatter
     fig_a = go.Figure()
-    for status, color, size, opacity in [('Normal','#7a9a7a',5,0.4), ('Flagged','#D48B8B',8,0.8)]:
+    for status, color, size, opacity in [('Normal','#7a9a7a',5,0.4),('Flagged','#D48B8B',8,0.8)]:
         sub = dff2[dff2['Status']==status]
         r,g,b = int(color[1:3],16),int(color[3:5],16),int(color[5:7],16)
         fig_a.add_trace(go.Scatter(
@@ -813,10 +768,9 @@ with tab4:
                 size=sub['ad_spend']/sub['ad_spend'].max()*size+3,
                 line=dict(color=f'rgba({r},{g},{b},{min(opacity+0.2,1)})', width=0.8)
             ),
-            hovertemplate=f'<b>{status}</b><br>Cost/Acquisition: $%{{x:.2f}}<br>Return: %{{y:.2f}}×<br><extra></extra>'
+            hovertemplate=f'<b>{status}</b><br>Cost/Acquisition: $%{{x:.2f}}<br>Return: %{{y:.2f}}×<extra></extra>'
         ))
 
-    # Highlight top 3 anomalies with labels
     top3 = dff2[dff2['_anom']==-1].nsmallest(3,'_score')
     for _, row in top3.iterrows():
         fig_a.add_annotation(
@@ -836,7 +790,7 @@ with tab4:
         'height':500
     })
     st.plotly_chart(fig_a, use_container_width=True)
-    insight_box("<strong style='color:#7a9a7a'>Green = healthy</strong> campaign — operating within normal parameters. <strong style='color:#D48B8B'>Pink = flagged</strong> — the AI detected unusual cost/return patterns. The <strong style='color:#C5A059'>gold labels</strong> mark the 3 most extreme anomalies — investigate these first.")
+    insight_box("<strong style='color:#7a9a7a'>Green = healthy</strong>. <strong style='color:#D48B8B'>Pink = flagged</strong>. <strong style='color:#C5A059'>Gold labels</strong> = top 3 most extreme anomalies — investigate these first.")
 
     section_title("Flagged Campaigns — Priority Review List")
     worst = dff2[dff2['_anom']==-1].nsmallest(10,'_score')[[
@@ -847,16 +801,14 @@ with tab4:
     st.markdown("</div>", unsafe_allow_html=True)
 
 
-# ════════════════════════════════════════════════════════════
-# TAB 5 — ROAS PREDICTOR
-# ════════════════════════════════════════════════════════════
+# ════════════════ TAB 5 — ROAS PREDICTOR ════════════════
 with tab5:
     st.markdown("<div style='padding:8px 48px 32px'>", unsafe_allow_html=True)
     section_title("ROAS Predictor", "XGBoost model · Predict return before spending")
 
     st.markdown("""
     <div style='font-family:Inter,sans-serif;font-size:12px;color:#5a5046;font-weight:300;line-height:1.8;max-width:560px;margin-bottom:32px'>
-        Enter your campaign parameters and the model — trained on real 2024 campaign data — 
+        Enter your campaign parameters and the model — trained on real 2024 campaign data —
         will estimate your expected Return on Ad Spend before you commit a single dollar.
     </div>
     """, unsafe_allow_html=True)
@@ -905,7 +857,6 @@ with tab5:
             _pred_html = f"""
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Inter:wght@200;300;400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <div style='background:#0d1012;border:1px solid rgba(212,139,139,0.12);padding:48px;margin-top:24px;position:relative;overflow:hidden'>
-    <div style='position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,139,139,0.4),rgba(197,160,89,0.3),transparent)'></div>
     <div style='font-family:DM Mono,monospace;font-size:8px;color:#4a4038;letter-spacing:6px;text-transform:uppercase;margin-bottom:32px'>
         &#9672; &nbsp; Prediction Result &nbsp; &middot; &nbsp; XGBoost Model &nbsp; &middot; &nbsp; R&sup2; = 59.1%
     </div>
@@ -913,44 +864,38 @@ with tab5:
         <div>
             <div style='font-family:Inter,sans-serif;font-size:64px;font-weight:200;color:#D48B8B;letter-spacing:-3px;line-height:1'>{pred:.2f}<span style='font-size:32px'>x</span></div>
             <div style='font-family:DM Mono,monospace;font-size:8px;color:#4a4038;letter-spacing:4px;text-transform:uppercase;margin-top:12px'>Return on Ad Spend</div>
-            <div style='font-family:Inter,sans-serif;font-size:11px;color:#7a7068;margin-top:6px'>For every $1 &rarr; ${pred:.2f} returned</div>
         </div>
         <div>
             <div style='font-family:Inter,sans-serif;font-size:64px;font-weight:200;color:#C5A059;letter-spacing:-3px;line-height:1'>${rev:,.0f}</div>
             <div style='font-family:DM Mono,monospace;font-size:8px;color:#4a4038;letter-spacing:4px;text-transform:uppercase;margin-top:12px'>Expected Revenue</div>
-            <div style='font-family:Inter,sans-serif;font-size:11px;color:#7a7068;margin-top:6px'>From ${p_spd:,} invested</div>
         </div>
         <div>
             <div style='font-family:Inter,sans-serif;font-size:64px;font-weight:200;color:#7a9a7a;letter-spacing:-3px;line-height:1'>{roi:.0f}<span style='font-size:32px'>%</span></div>
             <div style='font-family:DM Mono,monospace;font-size:8px;color:#4a4038;letter-spacing:4px;text-transform:uppercase;margin-top:12px'>Return on Investment</div>
-            <div style='font-family:Inter,sans-serif;font-size:11px;color:#7a7068;margin-top:6px'>Net profit: ${profit:,.0f}</div>
         </div>
     </div>
     <div style='border-top:1px solid rgba(212,139,139,0.08);padding-top:24px;font-family:Inter,sans-serif;font-size:12px;color:#7a7068;font-weight:300;line-height:1.7'>
-        <span style='color:#D48B8B;font-family:DM Mono,monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase'>Benchmark &middot; </span>
         Your predicted ROAS of <strong style='color:#e8e0d6;font-weight:400'>{pred:.2f}x</strong> is
         <strong style='color:{_bc};font-weight:400'>{_ba}{abs(vs_bench):.1f}% {_bw}</strong>
         the {p_plat} average of {benchmark:.2f}x.
     </div>
 </div>
-            """
+"""
             components.html(_pred_html, height=420, scrolling=False)
 
-            st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
             if pred >= 10:
-                st.success(f"Excellent efficiency. A {pred:.2f}× ROAS places this campaign in the top tier. Recommended to scale budget.")
+                st.success(f"Excellent efficiency. A {pred:.2f}× ROAS places this campaign in the top tier.")
             elif pred >= 5:
-                st.warning(f"Good performance. A {pred:.2f}× ROAS is profitable. Monitor closely and optimize targeting.")
+                st.warning(f"Good performance. A {pred:.2f}× ROAS is profitable. Monitor closely.")
             else:
-                st.error(f"Low efficiency. A {pred:.2f}× ROAS suggests underperformance. Review creative, targeting and budget before launching.")
+                st.error(f"Low efficiency. A {pred:.2f}× ROAS suggests underperformance. Review before launching.")
         else:
             st.error("Model not found. Run `python model.py` first to train the prediction model.")
     st.markdown("</div>", unsafe_allow_html=True)
 
-# ── FOOTER ────────────────────────────────────────────────────
 st.markdown("""
 <div style='text-align:center;padding:48px;border-top:1px solid rgba(212,139,139,0.06);margin-top:24px'>
-    <div style='font-family:Playfair Display,serif;font-style:italic;font-size:14px;color:rgba(232,224,214,0.2);margin-bottom:10px;letter-spacing:0.5px'>
+    <div style='font-family:Playfair Display,serif;font-style:italic;font-size:14px;color:rgba(232,224,214,0.2);margin-bottom:10px'>
         "I don't just analyze data — I engineer intelligence that drives revenue."
     </div>
     <div style='font-family:DM Mono,monospace;font-size:8px;color:rgba(232,224,214,0.12);letter-spacing:3px;text-transform:uppercase'>
